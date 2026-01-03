@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+
+    <div class="min-h-screen p-4 md:p-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <div class="inline-block p-4 bg-purple-500/20 rounded-full mb-4">
+                    <svg class="w-16 h-16 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-5xl font-bold text-white mb-3">📢 Notice Board</h1>
+                <p class="text-purple-200 text-lg">Stay updated with the latest announcements</p>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex gap-4 mb-8 justify-center">
+                <button onclick="switchTab('notices')" id="noticesTab"
+                    class="px-6 py-3 bg-white/20 text-white rounded-lg font-semibold transition border-2 border-purple-500">
+                    📋 View Notices
+                </button>
+                <button onclick="switchTab('complaint')" id="complaintTab"
+                    class="px-6 py-3 bg-white/10 text-purple-200 rounded-lg font-semibold hover:bg-white/20 transition border-2 border-transparent">
+                    💬 Submit Complaint
+                </button>
+            </div>
+
+            <!-- Notices Section -->
+            <div id="noticesSection">
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8 border border-white/20">
+                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                        <span class="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        Active Notices
+                    </h2>
+                    <div id="publicNotices" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Complaint Section -->
+            <div id="complaintSection" class="hidden">
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8 border border-white/20">
+                    <h2 class="text-2xl font-bold text-white mb-6">Submit Your Complaint</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-purple-200 text-sm font-medium mb-2">Your Name *</label>
+                            <input type="text" id="complaintName" 
+                                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                                placeholder="Enter your name">
+                        </div>
+
+                        <div>
+                            <label class="block text-purple-200 text-sm font-medium mb-2">Email Address *</label>
+                            <input type="email" id="complaintEmail" 
+                                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                                placeholder="your.email@example.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-purple-200 text-sm font-medium mb-2">Complaint Message *</label>
+                            <textarea id="complaintMessage" rows="6"
+                                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition resize-none"
+                                placeholder="Describe your complaint in detail..."></textarea>
+                        </div>
+
+                        <button onclick="submitComplaint()" 
+                            class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition transform hover:scale-105 shadow-lg">
+                            📤 Submit Complaint
+                        </button>
+
+                        <div id="complaintSuccess" class="hidden bg-green-500/20 border border-green-500/30 text-green-300 p-4 rounded-lg text-center">
+                            ✅ Your complaint has been submitted successfully!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let notices = [];
+        let currentTab = 'notices';
+
+        // Animate on load
+        gsap.from('.max-w-6xl', {
+            duration: 1,
+            y: 30,
+            opacity: 0,
+            ease: 'power3.out'
+        });
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            if (tab === 'notices') {
+                document.getElementById('noticesSection').classList.remove('hidden');
+                document.getElementById('complaintSection').classList.add('hidden');
+                document.getElementById('noticesTab').className = 'px-6 py-3 bg-white/20 text-white rounded-lg font-semibold transition border-2 border-purple-500';
+                document.getElementById('complaintTab').className = 'px-6 py-3 bg-white/10 text-purple-200 rounded-lg font-semibold hover:bg-white/20 transition border-2 border-transparent';
+            } else {
+                document.getElementById('noticesSection').classList.add('hidden');
+                document.getElementById('complaintSection').classList.remove('hidden');
+                document.getElementById('complaintTab').className = 'px-6 py-3 bg-white/20 text-white rounded-lg font-semibold transition border-2 border-purple-500';
+                document.getElementById('noticesTab').className = 'px-6 py-3 bg-white/10 text-purple-200 rounded-lg font-semibold hover:bg-white/20 transition border-2 border-transparent';
+            }
+
+            gsap.from(tab === 'notices' ? '#noticesSection' : '#complaintSection', {
+                duration: 0.5,
+                opacity: 0,
+                y: 20,
+                ease: 'power2.out'
+            });
+        }
+
+        function loadNotices() {
+            try {
+                const saved = localStorage.getItem('notices');
+                if (saved) {
+                    notices = JSON.parse(saved);
+                    displayNotices();
+                }
+            } catch (e) {
+                console.error('Could not load notices:', e);
+            }
+        }
+
+        function displayNotices() {
+            const container = document.getElementById('publicNotices');
+            const today = new Date();
+            
+            // Filter out expired notices
+            const activeNotices = notices.filter(notice => {
+                const expiryDate = new Date(notice.expiry);
+                return expiryDate >= today;
+            });
+
+            if (activeNotices.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="inline-block p-4 bg-purple-500/20 rounded-full mb-4">
+                            <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                        </div>
+                        <p class="text-purple-200 text-lg">No active notices at the moment</p>
+                        <p class="text-purple-300 text-sm mt-2">Check back later for updates</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = activeNotices.map((notice, index) => {
+                const daysLeft = Math.ceil((new Date(notice.expiry) - today) / (1000 * 60 * 60 * 24));
+                const isExpiringSoon = daysLeft <= 3;
+
+                return `
+                    <div class="notice-card bg-gradient-to-r from-white/5 to-white/10 border border-white/20 rounded-xl p-6 hover:from-white/10 hover:to-white/15 transition-all transform hover:scale-[1.02]" style="animation-delay: ${index * 0.1}s">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-2xl font-bold text-white flex-1">${notice.title}</h3>
+                            ${isExpiringSoon ? `
+                                <span class="px-3 py-1 bg-orange-500/20 text-orange-300 rounded-lg text-xs font-semibold border border-orange-500/30 animate-pulse">
+                                    ⏰ ${daysLeft} day${daysLeft !== 1 ? 's' : ''} left
+                                </span>
+                            ` : ''}
+                        </div>
+                        
+                        <p class="text-purple-100 text-lg mb-6 leading-relaxed">${notice.message}</p>
+                        
+                        <div class="flex flex-wrap gap-4 text-sm">
+                            <div class="flex items-center gap-2 text-purple-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>Posted: ${notice.date}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-purple-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>Expires: ${new Date(notice.expiry).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Animate notice cards
+            gsap.from('.notice-card', {
+                duration: 0.6,
+                y: 30,
+                opacity: 0,
+                stagger: 0.1,
+                ease: 'power2.out'
+            });
+        }
+
+        function submitComplaint() {
+            const name = document.getElementById('complaintName').value.trim();
+            const email = document.getElementById('complaintEmail').value.trim();
+            const message = document.getElementById('complaintMessage').value.trim();
+
+            if (!name || !email || !message) {
+                alert('⚠️ Please fill in all fields');
+                return;
+            }
+
+            if (!email.includes('@')) {
+                alert('⚠️ Please enter a valid email address');
+                return;
+            }
+
+            const complaint = {
+                id: Date.now(),
+                name,
+                email,
+                message,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString()
+            };
+
+            try {
+                let complaints = [];
+                const saved = localStorage.getItem('complaints');
+                if (saved) {
+                    complaints = JSON.parse(saved);
+                }
+                
+                complaints.push(complaint);
+                localStorage.setItem('complaints', JSON.stringify(complaints));
+
+                // Clear form
+                document.getElementById('complaintName').value = '';
+                document.getElementById('complaintEmail').value = '';
+                document.getElementById('complaintMessage').value = '';
+
+                // Show success message
+                const successDiv = document.getElementById('complaintSuccess');
+                successDiv.classList.remove('hidden');
+                
+                gsap.from(successDiv, {
+                    duration: 0.5,
+                    scale: 0.8,
+                    opacity: 0,
+                    ease: 'back.out(1.7)'
+                });
+
+                setTimeout(() => {
+                    gsap.to(successDiv, {
+                        duration: 0.3,
+                        opacity: 0,
+                        onComplete: () => successDiv.classList.add('hidden')
+                    });
+                }, 3000);
+
+            } catch (e) {
+                console.error('Could not submit complaint:', e);
+                alert('❌ Failed to submit complaint. Please try again.');
+            }
+        }
+
+        // Load notices on page load
+        loadNotices();
+
+        // Auto-refresh notices every 10 seconds
+        setInterval(loadNotices, 10000);
+    </script>
+
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notice-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
+</body>
+</html>

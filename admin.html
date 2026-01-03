@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notice Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/20">
+            <div class="text-center mb-8">
+                <div class="inline-block p-4 bg-purple-500/20 rounded-full mb-4">
+                    <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-white mb-2">Admin Login</h2>
+                <p class="text-purple-200">Enter your credentials to continue</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-purple-200 text-sm font-medium mb-2">Username</label>
+                    <input type="text" id="username" 
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                        placeholder="Enter username">
+                </div>
+
+                <div>
+                    <label class="block text-purple-200 text-sm font-medium mb-2">Password</label>
+                    <input type="password" id="password" 
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                        placeholder="Enter password">
+                </div>
+
+                <div id="loginError" class="hidden text-red-300 text-sm bg-red-500/20 p-3 rounded-lg"></div>
+
+                <button onclick="login()" 
+                    class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition transform hover:scale-105 shadow-lg">
+                    Sign In
+                </button>
+
+                <p class="text-purple-300 text-xs text-center mt-4">
+                    Demo: username: <span class="font-semibold text-white">admin</span> | password: <span class="font-semibold text-white">admin123</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden min-h-screen p-4 md:p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
+                    <p class="text-purple-200">Manage notices and view complaints</p>
+                </div>
+                <button onclick="logout()" 
+                    class="px-6 py-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition border border-red-500/30">
+                    Logout
+                </button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex gap-4 mb-8">
+                <button onclick="switchTab('notices')" id="noticesTab"
+                    class="px-6 py-3 bg-white/20 text-white rounded-lg font-semibold transition border-2 border-purple-500">
+                    📢 Notices
+                </button>
+                <button onclick="switchTab('complaints')" id="complaintsTab"
+                    class="px-6 py-3 bg-white/10 text-purple-200 rounded-lg font-semibold hover:bg-white/20 transition border-2 border-transparent">
+                    💬 Complaints <span id="complaintBadge" class="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">0</span>
+                </button>
+            </div>
+
+            <!-- Notices Section -->
+            <div id="noticesSection">
+                <!-- Notice Form -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8 mb-8 border border-white/20">
+                    <h2 class="text-2xl font-bold text-white mb-6">Create New Notice</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-purple-200 text-sm font-medium mb-2">Notice Title</label>
+                            <input type="text" id="title" 
+                                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                                placeholder="Enter notice title">
+                        </div>
+
+                        <div>
+                            <label class="block text-purple-200 text-sm font-medium mb-2">Notice Message</label>
+                            <textarea id="message" rows="4"
+                                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition resize-none"
+                                placeholder="Enter notice message"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-purple-200 text-sm font-medium mb-2">Expiry Date</label>
+                            <input type="date" id="expiry" 
+                                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition">
+                        </div>
+
+                        <button onclick="addNotice()" 
+                            class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold py-3 rounded-lg hover:from-green-600 hover:to-emerald-600 transition transform hover:scale-105 shadow-lg">
+                            📢 Add Notice
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Posted Notices -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8 border border-white/20">
+                    <h3 class="text-2xl font-bold text-white mb-6">Posted Notices</h3>
+                    <div id="adminNotices" class="space-y-4"></div>
+                </div>
+
+                <!-- Public Link -->
+                <div class="mt-8 text-center">
+                    <p class="text-purple-200 mb-3">Share this public link with users:</p>
+                    <a href="#" onclick="alert('In production, this would link to public.html'); return false;" 
+                        class="inline-block px-6 py-3 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition border border-blue-500/30">
+                        🌐 Open Public Notice Board
+                    </a>
+                </div>
+            </div>
+
+            <!-- Complaints Section -->
+            <div id="complaintsSection" class="hidden">
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8 border border-white/20">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-white">User Complaints</h3>
+                        <button onclick="clearAllComplaints()" 
+                            class="px-4 py-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition text-sm border border-red-500/30">
+                            Clear All
+                        </button>
+                    </div>
+                    <div id="complaintsContainer" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CREDENTIALS = { username: 'admin', password: 'admin123' };
+        let notices = [];
+        let complaints = [];
+        let currentTab = 'notices';
+
+        gsap.from('#loginScreen > div', {
+            duration: 1,
+            y: -50,
+            opacity: 0,
+            ease: 'back.out(1.7)'
+        });
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
+                gsap.to('#loginScreen', {
+                    duration: 0.5,
+                    opacity: 0,
+                    scale: 0.9,
+                    onComplete: () => {
+                        document.getElementById('loginScreen').classList.add('hidden');
+                        document.getElementById('adminPanel').classList.remove('hidden');
+                        
+                        gsap.from('#adminPanel > div', {
+                            duration: 0.8,
+                            y: 30,
+                            opacity: 0,
+                            stagger: 0.1,
+                            ease: 'power3.out'
+                        });
+                        
+                        loadData();
+                    }
+                });
+            } else {
+                errorDiv.textContent = '❌ Invalid username or password';
+                errorDiv.classList.remove('hidden');
+                
+                gsap.to('#loginScreen > div', {
+                    duration: 0.1,
+                    x: -10,
+                    yoyo: true,
+                    repeat: 5,
+                    ease: 'power1.inOut'
+                });
+            }
+        }
+
+        function logout() {
+            gsap.to('#adminPanel', {
+                duration: 0.5,
+                opacity: 0,
+                scale: 0.9,
+                onComplete: () => {
+                    document.getElementById('adminPanel').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                    document.getElementById('loginError').classList.add('hidden');
+                    
+                    gsap.from('#loginScreen > div', {
+                        duration: 0.8,
+                        y: -50,
+                        opacity: 0,
+                        ease: 'back.out(1.7)'
+                    });
+                }
+            });
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            if (tab === 'notices') {
+                document.getElementById('noticesSection').classList.remove('hidden');
+                document.getElementById('complaintsSection').classList.add('hidden');
+                document.getElementById('noticesTab').className = 'px-6 py-3 bg-white/20 text-white rounded-lg font-semibold transition border-2 border-purple-500';
+                document.getElementById('complaintsTab').className = 'px-6 py-3 bg-white/10 text-purple-200 rounded-lg font-semibold hover:bg-white/20 transition border-2 border-transparent';
+            } else {
+                document.getElementById('noticesSection').classList.add('hidden');
+                document.getElementById('complaintsSection').classList.remove('hidden');
+                document.getElementById('complaintsTab').className = 'px-6 py-3 bg-white/20 text-white rounded-lg font-semibold transition border-2 border-purple-500';
+                document.getElementById('noticesTab').className = 'px-6 py-3 bg-white/10 text-purple-200 rounded-lg font-semibold hover:bg-white/20 transition border-2 border-transparent';
+            }
+
+            gsap.from(tab === 'notices' ? '#noticesSection' : '#complaintsSection', {
+                duration: 0.5,
+                opacity: 0,
+                y: 20,
+                ease: 'power2.out'
+            });
+        }
+
+        function addNotice() {
+            const title = document.getElementById('title').value;
+            const message = document.getElementById('message').value;
+            const expiry = document.getElementById('expiry').value;
+
+            if (!title || !message || !expiry) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const notice = {
+                id: Date.now(),
+                title,
+                message,
+                expiry,
+                date: new Date().toLocaleDateString()
+            };
+
+            notices.unshift(notice);
+            saveData();
+            displayNotices();
+
+            document.getElementById('title').value = '';
+            document.getElementById('message').value = '';
+            document.getElementById('expiry').value = '';
+
+            gsap.from('#adminNotices > div:first-child', {
+                duration: 0.5,
+                x: -50,
+                opacity: 0,
+                ease: 'back.out(1.7)'
+            });
+        }
+
+        function deleteNotice(id) {
+            const element = document.querySelector(`[data-notice-id="${id}"]`);
+            
+            gsap.to(element, {
+                duration: 0.3,
+                x: 50,
+                opacity: 0,
+                onComplete: () => {
+                    notices = notices.filter(n => n.id !== id);
+                    saveData();
+                    displayNotices();
+                }
+            });
+        }
+
+        function displayNotices() {
+            const container = document.getElementById('adminNotices');
+            
+            if (notices.length === 0) {
+                container.innerHTML = '<p class="text-purple-200 text-center py-8">No notices posted yet</p>';
+                return;
+            }
+
+            container.innerHTML = notices.map(notice => `
+                <div data-notice-id="${notice.id}" class="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-xl font-bold text-white">${notice.title}</h4>
+                        <button onclick="deleteNotice(${notice.id})" 
+                            class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition text-sm">
+                            Delete
+                        </button>
+                    </div>
+                    <p class="text-purple-100 mb-4">${notice.message}</p>
+                    <div class="flex gap-4 text-sm text-purple-300">
+                        <span>📅 Posted: ${notice.date}</span>
+                        <span>⏰ Expires: ${new Date(notice.expiry).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayComplaints() {
+            const container = document.getElementById('complaintsContainer');
+            const badge = document.getElementById('complaintBadge');
+            
+            badge.textContent = complaints.length;
+
+            if (complaints.length === 0) {
+                container.innerHTML = '<p class="text-purple-200 text-center py-8">No complaints submitted yet</p>';
+                return;
+            }
+
+            container.innerHTML = complaints.map(complaint => `
+                <div data-complaint-id="${complaint.id}" class="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="text-lg font-bold text-white">${complaint.name}</h4>
+                                <span class="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded">
+                                    ${complaint.email}
+                                </span>
+                            </div>
+                            <p class="text-sm text-purple-300 mb-3">📅 ${complaint.date} at ${complaint.time}</p>
+                        </div>
+                        <button onclick="deleteComplaint(${complaint.id})" 
+                            class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition text-sm">
+                            Delete
+                        </button>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-4">
+                        <p class="text-purple-100">${complaint.message}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteComplaint(id) {
+            const element = document.querySelector(`[data-complaint-id="${id}"]`);
+            
+            gsap.to(element, {
+                duration: 0.3,
+                x: 50,
+                opacity: 0,
+                onComplete: () => {
+                    complaints = complaints.filter(c => c.id !== id);
+                    saveData();
+                    displayComplaints();
+                }
+            });
+        }
+
+        function clearAllComplaints() {
+            if (complaints.length === 0) return;
+            
+            if (confirm('Are you sure you want to delete all complaints?')) {
+                complaints = [];
+                saveData();
+                displayComplaints();
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('notices', JSON.stringify(notices));
+                localStorage.setItem('complaints', JSON.stringify(complaints));
+            } catch (e) {
+                console.error('Could not save data:', e);
+            }
+        }
+
+        function loadData() {
+            try {
+                const savedNotices = localStorage.getItem('notices');
+                const savedComplaints = localStorage.getItem('complaints');
+                
+                if (savedNotices) notices = JSON.parse(savedNotices);
+                if (savedComplaints) complaints = JSON.parse(savedComplaints);
+                
+                displayNotices();
+                displayComplaints();
+            } catch (e) {
+                console.error('Could not load data:', e);
+            }
+        }
+
+        // Auto-refresh complaints every 5 seconds
+        setInterval(() => {
+            if (!document.getElementById('adminPanel').classList.contains('hidden')) {
+                const savedComplaints = localStorage.getItem('complaints');
+                if (savedComplaints) {
+                    const newComplaints = JSON.parse(savedComplaints);
+                    if (JSON.stringify(newComplaints) !== JSON.stringify(complaints)) {
+                        complaints = newComplaints;
+                        displayComplaints();
+                    }
+                }
+            }
+        }, 5000);
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !document.getElementById('loginScreen').classList.contains('hidden')) {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
